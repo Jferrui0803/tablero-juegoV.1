@@ -1,0 +1,32 @@
+.board {
+    display: grid;
+    gap: 5px; 
+}
+
+.tile {
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dotted #000000;
+    background-position: center;
+    background-size: contain;
+}
+
+#controls button {
+    padding: 20px 40px;
+    margin: 5px;
+    border: none;
+    background-color: #3498db;
+    color: #ffffff;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#controls button:hover {
+    background-color: #2980b9;
+}
+
+

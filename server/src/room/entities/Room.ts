@@ -3,6 +3,7 @@ import { Player } from "../../player/entities/Player";
 
 export const RoomConfig = {
     maxRoomPlayers : 4
+
 };
 
 export interface Room {

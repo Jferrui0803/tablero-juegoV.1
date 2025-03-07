@@ -61,9 +61,6 @@ export class GameService {
       case Directions.Left:
         targetY = Math.max(0, player.y - 1); // Izquierda
         break;
-      case Directions.Idle:
-        console.log("El jugador está en estado Idle y no se moverá.");
-        return;
       default:
         console.warn(`Dirección desconocida: ${direction}`);
         return;

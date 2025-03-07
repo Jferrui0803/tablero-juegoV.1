@@ -21,7 +21,6 @@ export const ConnectionHandler = {
 
     this.socket.on("message", (payload) => {
       this.controller.actionController(payload);
-      console.log("Ha llegado un payload", payload);
     });
 
     this.socket.on("disconnect", () => {

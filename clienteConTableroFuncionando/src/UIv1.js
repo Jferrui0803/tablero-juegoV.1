@@ -13,18 +13,37 @@ UIv1.movePlayer = (player, direction) => {
   ConnectionHandler.socket.emit("movePlayer", direction);
 };
 
-
 UIv1.shootPlayer = (player) => {
   console.log(player);
   ConnectionHandler.socket.emit("shootPlayer", player);
 };
 
+function rotacionGrados(r){
+  let direction;
+  switch (r) {
+    case 0:
+      direction = 3;
+      break;
+    case 90:
+      direction = 1;
+      break;
+    case 180:
+      direction = 2;
+      break;
+    case 270:
+      direction = 0;
+      break;
+    default:
+      direction = 3
+  }
+
+  return direction
+}
+
 UIv1.drawPlayers = async (players) => {
-  console.log("Dibujando jugadores:", players);
 
   // Obtener el socket ID del cliente conectado
   const socketId = await ConnectionHandler.getClientSocketId();
-  console.log("Socket ID del jugador conectado:", socketId);
 
   UIv1.players = players;
   const boardElement = document.getElementById(UIv1.uiElements.board);
@@ -56,23 +75,24 @@ UIv1.drawPlayers = async (players) => {
       playerIcon.style.position = "absolute";
       playerIcon.dataset.rotation = 0;
 
+      // cambiar switch de palabras a números
       if (player.direction !== undefined || player.direction !== 0) {
         switch (player.direction) {
-          case "right":
-            playerIcon.style.transform = "rotate(0deg)";
-            playerIcon.dataset.rotation = 0;
+          case 0:
+            playerIcon.style.transform = "rotate(270deg)";
+            playerIcon.dataset.rotation = 270;
             break;
-          case "down":
+          case 1:
             playerIcon.style.transform = "rotate(90deg)";
             playerIcon.dataset.rotation = 90;
             break;
-          case "left":
+          case 2:
             playerIcon.style.transform = "rotate(180deg)";
             playerIcon.dataset.rotation = 180;
             break;
-          case "up":
-            playerIcon.style.transform = "rotate(270deg)";
-            playerIcon.dataset.rotation = 270;
+          case 3:
+            playerIcon.style.transform = "rotate(0deg)";
+            playerIcon.dataset.rotation = 0;
             break;
           default:
             playerIcon.style.transform = "rotate(0deg)";
@@ -91,23 +111,7 @@ UIv1.drawPlayers = async (players) => {
         btnAdvance.addEventListener("click", () => {
           const img = document.getElementById(player.id);
           let currentRotation = parseInt(img.dataset.rotation) || 0;
-          let direction;
-          switch (currentRotation) {
-            case 0:
-              direction = "right";
-              break;
-            case 90:
-              direction = "down";
-              break;
-            case 180:
-              direction = "left";
-              break;
-            case 270:
-              direction = "up";
-              break;
-            default:
-              direction = "right";
-          }
+          let direction = rotacionGrados(currentRotation);
           UIv1.movePlayer(player, direction);
         });
         controlsContainer.appendChild(btnAdvance);
@@ -122,23 +126,15 @@ UIv1.drawPlayers = async (players) => {
           img.style.transform = `rotate(${newRotation}deg)`;
           img.dataset.rotation = newRotation;
           // Actualizar la dirección en el objeto player
-          switch (newRotation) {
-            case 0:
-              player.direction = "right";
-              break;
-            case 90:
-              player.direction = "down";
-              break;
-            case 180:
-              player.direction = "left";
-              break;
-            case 270:
-              player.direction = "up";
-              break;
-          }
-          console.log(`Jugador ${player.id} rotado a ${newRotation}° (${player.direction})`);
-          
-          ConnectionHandler.socket.emit("rotatePlayer", { id: player.id, direction: player.direction });
+          player.direction =  rotacionGrados(newRotation);
+          console.log(
+            `Jugador ${player.id} rotado a ${newRotation}° (${player.direction})`
+          );
+
+          ConnectionHandler.socket.emit("rotatePlayer", {
+            id: player.id,
+            direction: player.direction,
+          });
         });
         controlsContainer.appendChild(btnRotate);
 
@@ -180,7 +176,6 @@ UIv1.drawBoard = (board) => {
       });
     });
 
-
     base.querySelectorAll(".tile").forEach((tile) => {
       anime({
         targets: tile,
@@ -189,3 +184,5 @@ UIv1.drawBoard = (board) => {
     });
   }
 };
+
+

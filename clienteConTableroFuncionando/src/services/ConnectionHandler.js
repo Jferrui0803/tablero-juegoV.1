@@ -46,7 +46,7 @@ export const ConnectionHandler = {
           clearInterval(checkSocket);
           resolve(id);
         }
-      }, 100); // Revisa cada 100ms hasta que obtenga un ID válido
+      }, 100); 
     });
   }
 };

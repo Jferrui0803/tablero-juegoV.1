@@ -26,7 +26,6 @@ export class GameController {
 
   // Método que actúa como controlador de acciones basado en el tipo de mensaje recibido.
   actionController(payload) {
-    // Si el payload es de tipo 'NEW_PLAYER', se llama al método específico para nuevos jugadores.
     if (payload.type === "NEW_PLAYER") {
       this.#gameService.do_newPlayer(payload.content);
     } else if (payload.type === "BOARD") {

@@ -35,7 +35,7 @@ export class GameService {
 
   public movePlayer(socket: Socket, direction: Directions): void {
     const room = RoomService.getInstance().findRoomByPlayer(socket);
-    if (!room || !room.game || !room.game.board) return; // Verifica que existan room, game y board
+    if (!room || !room.game || !room.game.board) return; 
 
     const player = room.players.find((player) => player.id.id === socket.id);
     if (!player) {
@@ -110,19 +110,18 @@ export class GameService {
       Messages.NEW_PLAYER,
       playersList
     );
-
   }
 
   public rotatePlayer(data: any): void {
     const room = RoomService.getInstance().getRoomByPlayerId(data.id);
     if (!room || !room.game) return;
-    const player = room.players.find(p => p.id.id === data.id);
+    const player = room.players.find((p) => p.id.id === data.id);
     if (!player) return;
     player.direction = data.direction;
     // Se envía la actualización a todos los clientes
     const playersList = room.players
-      .filter(p => p.state !== PlayerStates.Dead)
-      .map(p => ({
+      .filter((p) => p.state !== PlayerStates.Dead)
+      .map((p) => ({
         id: p.id.id,
         x: p.x,
         y: p.y,
@@ -130,7 +129,11 @@ export class GameService {
         direction: p.direction,
         visibility: p.visibility,
       }));
-    ServerService.getInstance().sendMessage(room.name, Messages.NEW_PLAYER, playersList);
+    ServerService.getInstance().sendMessage(
+      room.name,
+      Messages.NEW_PLAYER,
+      playersList
+    );
   }
 
   public shootPlayer(data: any): void {
@@ -179,7 +182,7 @@ export class GameService {
     const targetPlayer = room.players.find(
       (p) => p.x === targetX && p.y === targetY
     );
-    if (targetPlayer && targetPlayer.visibility ) {
+    if (targetPlayer && targetPlayer.visibility) {
       // Se "mata" al jugador actualizando su estado
       targetPlayer.state = PlayerStates.Dead;
       console.log(
@@ -189,20 +192,30 @@ export class GameService {
 
     // Enviar el estado del juego solo de los jugadores vivos
     const playersList = room.players
-      .filter((p) => p.state !== PlayerStates.Dead)
-      .map((p) => ({
-        id: p.id.id,
-        x: p.x,
-        y: p.y,
-        state: p.state,
-        direction: p.direction,
-        visibility: p.visibility,
-      }));
-    ServerService.getInstance().sendMessage(
-      room.name,
-      Messages.NEW_PLAYER,
-      playersList
-    );
+    .filter((p) => p.id.id === data.id || p.state !== PlayerStates.Dead)
+    .map((p) => ({
+      id: p.id.id,
+      x: p.x,
+      y: p.y,
+      state: p.state,
+      direction: p.direction,
+      visibility: p.visibility,
+    }));
+
+    
+  ServerService.getInstance().sendMessage(
+    room.name,
+    Messages.NEW_PLAYER,
+    playersList
+  );
+
+  const livePlayers = room.players.filter((p) => p.state !== PlayerStates.Dead);
+  if (livePlayers.length === 1 && room.players.length > 1) {
+    ServerService.getInstance().sendMessage(room.name, "gameOver", {
+      winner: livePlayers[0].id.id,
+    });
+  }
+
   }
 
   public removePlayer(socket: Socket): void {
@@ -312,8 +325,6 @@ export class GameService {
       }
       return true;
     }
-
-    // Si la sala aún no está llena, se retorna false.
     return false;
   }
 }

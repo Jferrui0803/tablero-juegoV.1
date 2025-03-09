@@ -9,14 +9,16 @@ UIv1.initUI = () => {
 };
 
 UIv1.movePlayer = (player, direction) => {
-  console.log(`Enviando movimiento de ${player.id} en dirección ${direction}`);
+  console.log(`El jugador: ${player.id} se ha movido en la dirección ${direction}`);
   ConnectionHandler.socket.emit("movePlayer", direction);
 };
 
 UIv1.shootPlayer = (player) => {
-  console.log(player);
+  console.log(`El jugador ${player.id} ha disparado`);
   ConnectionHandler.socket.emit("shootPlayer", player);
 };
+
+UIv1.gameStarted = false;
 
 function rotacionGrados(r){
   let direction;
@@ -59,6 +61,11 @@ UIv1.drawPlayers = async (players) => {
   });
 
   players.forEach((player) => {
+
+    if (!player.visibility) {
+      console.log(`El jugador ${player.id} está oculto por entrar en un arbusto`);
+    }
+
     // Si el jugador NO es el usuario actual y está oculto, no se dibuja
     if (player.id !== socketId && !player.visibility) return;
 
@@ -152,6 +159,16 @@ UIv1.drawPlayers = async (players) => {
     }
   });
 
+  if (players.length === 4 && !UIv1.gameStarted) {
+    UIv1.showControlMessage("La partida ha comenzado!!");
+    UIv1.gameStarted = true;
+  }
+
+  if (players.length === 1 && UIv1.gameStarted) {
+    UIv1.showControlMessage(`Enhorabuena al jugador ${players[0].id} , ha ganado la partida!!`, true, true);
+    UIv1.gameStarted = false;
+}
+
   console.log("Jugadores actualizados:", players);
 };
 
@@ -183,6 +200,19 @@ UIv1.drawBoard = (board) => {
       });
     });
   }
+};
+
+UIv1.showControlMessage = (message, persistent = false) => {
+    const msgDiv = document.createElement("div");
+    msgDiv.innerText = message;
+    msgDiv.id = "controlMessage";
+    document.body.appendChild(msgDiv);
+  
+    if (!persistent) {
+      setTimeout(() => {
+        msgDiv.remove();
+      }, 3000);
+    }
 };
 
 

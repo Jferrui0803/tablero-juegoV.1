@@ -1,7 +1,6 @@
 import { DefaultEventsMap, Server, Socket } from "socket.io";
 import http from "http";
 import { GameService } from "../game/GameService";
-import { AnyTxtRecord } from "dns";
 import { Directions } from "../player/entities/Player";
 
 export class ServerService {
@@ -74,6 +73,7 @@ export class ServerService {
         console.log("Un cliente se ha desconectado:", socket.id);
         GameService.getInstance().removePlayer(socket);
       });
+      
     });
   }
 
